@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    보안: 이 페이지는 입력 내용을 어떤 서버로도 보낼 수 없도록 막아 둡니다.
+    - connect-src 'none' : fetch/XHR 등 데이터 전송 차단
+    - form-action 'none' : <form> 전송 차단
+    작성 내용은 브라우저 화면에만 있고, PDF는 사용자의 PC에 저장됩니다.
+  -->
+  <meta http-equiv="Content-Security-Policy"
+        content="connect-src 'none'; form-action 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>가치 실천 시상 추천서</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="brand-logo" src="./logo.png" alt="상상인" width="755" height="231">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-service">2026 연말 가치 실천 시상 · 추천서 작성</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    <!-- ============ 1) 작성 화면 ============ -->
+    <section id="form-view" aria-labelledby="page-title">
+      <div class="page-head">
+        <h1 id="page-title">2026 연말 가치 실천 시상 추천서</h1>
+        <p class="lead">2026년 중 Winning Rules를 실천한 동료 또는 본인의 사례를 추천해 주세요.</p>
+      </div>
+
+      <!-- 제출 절차 안내 -->
+      <ol class="steps" aria-label="추천서 제출 절차">
+        <li class="step-item is-current">
+          <span class="step-no">1</span>
+          <span><strong>추천서 작성</strong><span class="step-desc">이 페이지에서 작성</span></span>
+        </li>
+        <li class="step-item">
+          <span class="step-no">2</span>
+          <span><strong>확인 후 PDF로 저장</strong><span class="step-desc">내 PC에 파일 저장</span></span>
+        </li>
+        <li class="step-item">
+          <span class="step-no">3</span>
+          <span><strong>이메일로 제출</strong><span class="step-desc"><span data-config="email"></span></span></span>
+        </li>
+      </ol>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <h2 class="info-title">작성 원칙</h2>
+          <p>추천서 1장에 <strong>사례 1건</strong>, <strong>대표 부문 1개</strong>만 선택합니다. 1인 여러 건 추천이 가능하며, 본인 추천도 가능합니다.</p>
+        </div>
+        <div class="info-card">
+          <h2 class="info-title">작성 팁</h2>
+          <p>① 언제, 어떤 업무·프로젝트에서 무엇을 했는지 ② 그래서 무엇이 달라졌는지 ③ 확인해 줄 수 있는 사람이나 자료가 있는지를 2~3줄씩 적어 주세요.</p>
+          <p class="small muted">업무 혹은 프로젝트 수행 과정에서 Winning Rules를 실천한 사례 모두 추천 가능합니다.</p>
+        </div>
+        <div class="info-card info-card--accent">
+          <h2 class="info-title">추천 접수 기간</h2>
+          <p><strong data-config="periodLabel"></strong></p>
+          <p class="small">마감 <span data-config="deadlineLabel"></span>까지 이메일 제출</p>
+          <p class="deadline-notice" data-deadline-notice hidden></p>
+        </div>
+      </div>
+
+      <p class="privacy-note">입력한 내용은 이 페이지 밖으로 전송되거나 저장되지 않습니다. 페이지를 닫거나 새로고침하면 내용이 사라지니, 작성을 마치면 꼭 PDF로 저장해 주세요.</p>
+
+      <div id="error-summary" class="error-summary" role="alert" tabindex="-1" hidden>
+        <h2>입력 내용을 확인해 주세요</h2>
+        <ul id="error-list"></ul>
+      </div>
+
+      <form id="nomination-form" novalidate autocomplete="off">
+        <!-- ① 기본 정보 -->
+        <section class="card" aria-labelledby="sec-basic">
+          <h2 class="card-title" id="sec-basic"><span class="num">①</span> 기본 정보</h2>
+
+          <!-- 추천 부문 -->
+          <fieldset id="category" class="field-block">
+            <legend class="label">추천 부문 <span class="req" aria-label="필수">*</span></legend>
+            <p class="hint">대표 부문 1개만 선택합니다.</p>
+            <div id="category-options" class="option-grid"></div>
+            <p class="field-error" id="category-error" hidden></p>
+          </fieldset>
+
+          <!-- 추천 유형 -->
+          <fieldset id="nominationType" class="field-block">
+            <legend class="label">추천 유형 <span class="req" aria-label="필수">*</span></legend>
+            <div class="segmented">
+              <label class="seg-item">
+                <input type="radio" name="nominationType" value="individual" checked>
+                <span>개인</span>
+              </label>
+              <label class="seg-item">
+                <input type="radio" name="nominationType" value="group">
+                <span>단체 (2명 이상)</span>
+              </label>
+            </div>
+            <p class="field-error" id="nominationType-error" hidden></p>
+          </fieldset>
+
+          <!-- 추천 대상 (개인) -->
+          <div id="individual-target" class="field-block">
+            <h3 class="label">추천 대상 <span class="req" aria-label="필수">*</span></h3>
+            <div class="row-3">
+              <div class="field">
+                <label for="target-name">성명</label>
+                <input id="target-name" type="text" data-limit="name">
+                <p class="field-error" id="target-name-error" hidden></p>
+              </div>
+              <div class="field">
+                <label for="target-org">소속</label>
+                <input id="target-org" type="text" data-limit="org" placeholder="예) 고객지원팀">
+                <p class="field-error" id="target-org-error" hidden></p>
+              </div>
+              <div class="field">
+                <label for="target-rank">직급</label>
+                <input id="target-rank" type="text" data-limit="rank" placeholder="예) 과장">
+                <p class="field-error" id="target-rank-error" hidden></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 추천 대상 (단체) -->
+          <div id="group-target" class="field-block" hidden>
+            <div class="group-head">
+              <h3 class="label">단체 추천 시 구성원 명단 <span class="req" aria-label="필수">*</span></h3>
+              <span class="small muted" id="member-count" aria-live="polite"></span>
+            </div>
+            <p class="hint">2명 이상 입력해 주세요. 구성원마다 사례에서 맡은 역할을 함께 적어 주세요.</p>
+            <div id="members" tabindex="-1">
+              <ol id="member-list" class="member-list"></ol>
+            </div>
+            <p class="field-error" id="members-error" hidden></p>
+            <button type="button" id="add-member" class="btn btn-outline btn-sm">+ 구성원 추가</button>
+          </div>
+
+          <!-- 추천인 -->
+          <div class="field-block">
+            <h3 class="label">추천인 <span class="req" aria-label="필수">*</span></h3>
+            <div class="row-3">
+              <div class="field">
+                <label for="nominator-name">성명</label>
+                <input id="nominator-name" type="text" data-limit="name">
+                <p class="field-error" id="nominator-name-error" hidden></p>
+              </div>
+              <div class="field">
+                <label for="nominator-org">소속</label>
+                <input id="nominator-org" type="text" data-limit="org" placeholder="예) 영업지원팀">
+                <p class="field-error" id="nominator-org-error" hidden></p>
+              </div>
+              <div class="field field--check">
+                <label class="check">
+                  <input id="nominator-self" type="checkbox">
+                  <span>본인 추천</span>
+                </label>
+                <p class="hint">본인 또는 본인이 속한 단체를 추천하는 경우 체크</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 관련 Winning Rules -->
+          <div class="field-block">
+            <h3 class="label">관련 Winning Rules <span class="req" aria-label="필수">*</span></h3>
+            <div class="row-rule">
+              <div class="field">
+                <label for="rule-number">번호</label>
+                <input id="rule-number" type="text" inputmode="numeric" maxlength="2" placeholder="예) 06">
+                <p class="field-error" id="rule-number-error" hidden></p>
+              </div>
+              <div class="field">
+                <label for="rule-text">내용</label>
+                <input id="rule-text" type="text" data-limit="ruleText" placeholder="예) 우리 팀을 넘어 우리 회사의 답을 찾는다">
+                <p class="field-error" id="rule-text-error" hidden></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 사례 기간 -->
+          <fieldset id="period" class="field-block">
+            <legend class="label">사례 기간 <span class="req" aria-label="필수">*</span></legend>
+            <div class="period">
+              <span class="period-year">2026년</span>
+              <label class="sr-only" for="period-start">시작 월</label>
+              <select id="period-start"></select>
+              <span class="period-sep">~</span>
+              <span class="period-year">2026년</span>
+              <label class="sr-only" for="period-end">종료 월</label>
+              <select id="period-end"></select>
+            </div>
+            <p class="field-error" id="period-error" hidden></p>
+          </fieldset>
+        </section>
+
+        <!-- ② 추천 내용 -->
+        <section class="card" aria-labelledby="sec-content">
+          <h2 class="card-title" id="sec-content"><span class="num">②</span> 추천 내용</h2>
+
+          <div class="field-block">
+            <div class="label-row">
+              <label class="label" for="content-action"><span class="step">1</span> 무엇을 했나 (행동) <span class="req" aria-label="필수">*</span></label>
+              <span class="counter" id="content-action-count"></span>
+            </div>
+            <p class="hint">일상 업무 속 작은 실천부터 프로젝트에서 맡은 역할과 기여까지 모두 좋습니다. 언제, 어떤 일에서, 무엇을 했는지 2~3줄로 적어 주세요. 태도가 아니라 확인할 수 있는 행동으로 적어 주세요.</p>
+            <textarea id="content-action" rows="8" data-limit="action"
+              placeholder="예1) 지점마다 따로 관리하던 고객 문의 응대 사례를 모아 공통 FAQ와 응대 기준을 만들고, 3개 부서와 매달 함께 업데이트하는 방식을 정착시킴 (2026년 4~9월)&#10;&#10;예2) 2026년 ○○은행 전산센터 이전 프로젝트에서 현장 PM을 맡아 이전 과정에서 발생할 수 있는 장애 위험요소를 사전에 점검함. 고객사 및 협력사와 협업하여 단계별 이전 계획과 비상 대응체계를 수립하고, 주요 장비 및 시스템에 대한 사전 검증을 강화하여 예상 장애 위험요소의 90% 이상을 이전 작업 전에 조치함."></textarea>
+            <p class="field-error" id="content-action-error" hidden></p>
+          </div>
+
+          <div class="field-block">
+            <div class="label-row">
+              <label class="label" for="content-change"><span class="step">2</span> 무엇이 달라졌나 (변화) <span class="req" aria-label="필수">*</span></label>
+              <span class="counter" id="content-change-count"></span>
+            </div>
+            <p class="hint">프로젝트 성과나 결과로 달라진 점, 다른 팀 · 부서로 퍼진 사례가 있다면 함께 적어 주세요.</p>
+            <textarea id="content-change" rows="7" data-limit="change"
+              placeholder="예1) 같은 문의를 다시 확인하는 일이 줄었고, 신규 입사자 응대 교육에 그대로 활용됨. 다른 부서 2곳이 같은 방식을 도입함&#10;&#10;예2) 철저한 사전 점검과 체계적인 대응을 통해 이전 과정에서 발생한 장애 건수를 당초 예상 대비 80% 감소시키고, 전체 이전 작업 기간을 기존 계획 대비 30% 단축함. 이를 통해 고객사의 업무 연속성을 확보하고 프로젝트 운영 효율성과 고객 신뢰도 향상에 기여함."></textarea>
+            <p class="field-error" id="content-change-error" hidden></p>
+          </div>
+
+          <div class="field-block">
+            <div class="label-row">
+              <label class="label" for="content-evidence"><span class="step">3</span> 확인 근거 <span class="req" aria-label="필수">*</span></label>
+              <span class="counter" id="content-evidence-count"></span>
+            </div>
+            <p class="hint">확인해 줄 수 있는 사람이나 자료를 적어 주세요. 증빙 자료 파일이 있다면 이메일 제출 시 PDF와 함께 첨부해 주세요.</p>
+            <textarea id="content-evidence" rows="4" data-limit="evidence"
+              placeholder="예1) 공통 FAQ 문서, 고객지원팀장 확인&#10;예2) 프로젝트 이전 계획서, 사전 점검 및 장애 조치 내역, 작업 일정 비교표, 프로젝트 완료 보고서, 고객사 담당자 및 프로젝트 PM 확인"></textarea>
+            <p class="field-error" id="content-evidence-error" hidden></p>
+          </div>
+        </section>
+
+        <!-- 확인 -->
+        <section class="card card--accent" aria-label="작성 확인">
+          <label class="check check--lg">
+            <input id="fact-confirm" type="checkbox">
+            <span>위 내용은 사실에 근거해 작성했습니다. <span class="req" aria-label="필수">*</span></span>
+          </label>
+          <p class="field-error" id="fact-confirm-error" hidden></p>
+          <dl class="sign">
+            <div><dt>작성일</dt><dd id="write-date"></dd></div>
+            <div><dt>추천인</dt><dd id="sign-name" class="muted">추천인 성명을 입력하면 표시됩니다</dd></div>
+          </dl>
+        </section>
+
+        <div class="actions">
+          <button type="button" id="reset-form" class="btn btn-ghost">처음부터 다시 작성</button>
+          <button type="submit" class="btn btn-primary">작성 완료 · 내용 확인</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ 2) 확인 · PDF 저장 화면 ============ -->
+    <section id="review-view" hidden aria-labelledby="review-title">
+      <div class="page-head no-print">
+        <h1 id="review-title" tabindex="-1">작성 내용을 확인하고 PDF로 저장해 주세요</h1>
+        <p class="lead">내용이 맞으면 <strong>[PDF로 저장]</strong>을 누르세요. 고칠 부분이 있으면 [수정하기]를 누르세요.</p>
+      </div>
+
+      <div class="review-toolbar no-print">
+        <button type="button" class="btn btn-outline js-edit">수정하기</button>
+        <button type="button" class="btn btn-primary btn-pdf js-save-pdf">PDF로 저장</button>
+      </div>
+
+      <!-- PDF(인쇄)에서만 보이는 문서 제목 -->
+      <div class="print-only print-title">
+        <h1>2026 연말 가치 실천 시상 추천서</h1>
+      </div>
+
+      <div id="review-content"></div>
+
+      <!-- PDF 저장 안내 -->
+      <section class="guide-panel guide-panel--pdf no-print" aria-labelledby="pdf-guide-title">
+        <div class="guide-head">
+          <span class="guide-step">STEP 2</span>
+          <h2 id="pdf-guide-title">PDF로 저장하기</h2>
+        </div>
+        <ol class="guide-list">
+          <li>아래 <strong>[PDF로 저장]</strong> 버튼을 누르면 인쇄 창이 열립니다.</li>
+          <li>인쇄 창의 <strong>대상(프린터)</strong>을 <strong>'PDF로 저장'</strong>으로 바꿉니다.<br>
+            <span class="muted small">Edge는 'PDF로 저장', Chrome은 'PDF로 저장' 또는 'Save as PDF'로 표시됩니다. 'Microsoft Print to PDF'를 골라도 됩니다.</span></li>
+          <li><strong>[저장]</strong>을 누르고 저장할 위치(예: 바탕화면)를 선택합니다.</li>
+        </ol>
+        <p class="file-name">권장 파일 이름 <code id="pdf-file-name"></code></p>
+        <button type="button" class="btn btn-primary btn-pdf btn-block js-save-pdf">PDF로 저장</button>
+      </section>
+
+      <!-- PDF 저장 직후 안내 (인쇄 창이 닫히면 표시) -->
+      <div id="after-print" class="after-print no-print" role="status" hidden>
+        <strong>PDF 파일을 저장하셨나요?</strong>
+        아직 제출된 것이 아닙니다. 저장한 PDF 파일을 아래 이메일 주소로 보내야 추천이 접수됩니다.
+      </div>
+
+      <!-- 이메일 제출 안내 -->
+      <section class="guide-panel no-print" aria-labelledby="mail-guide-title">
+        <div class="guide-head">
+          <span class="guide-step">STEP 3</span>
+          <h2 id="mail-guide-title">이메일로 제출하기</h2>
+        </div>
+        <dl class="mail-info">
+          <div><dt>받는 사람</dt><dd><strong data-config="email"></strong> (<span data-config="contactName"></span>)</dd></div>
+          <div><dt>메일 제목</dt><dd><code id="mail-subject"></code></dd></div>
+          <div><dt>첨부 파일</dt><dd>저장한 추천서 PDF (증빙 자료가 있으면 함께 첨부)</dd></div>
+          <div><dt>접수 기간</dt><dd><span data-config="periodLabel"></span></dd></div>
+          <div><dt>제출 마감</dt><dd><strong data-config="deadlineLabel"></strong>까지</dd></div>
+        </dl>
+        <p class="mail-note">이메일을 보내야 추천이 접수됩니다. 이 웹페이지는 작성 내용을 저장하거나 전송하지 않습니다.</p>
+      </section>
+
+      <div class="actions no-print">
+        <button type="button" id="new-form" class="btn btn-ghost">새 추천서 작성</button>
+        <button type="button" class="btn btn-outline js-edit">수정하기</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      문의: 컬처앤피플실 한혜원 사원 · hw.han@sangsanginworld.co.kr
+    </div>
+  </footer>
+
+  <!-- 단체 구성원 한 줄의 틀(템플릿). JavaScript가 복사해서 사용합니다. -->
+  <template id="member-row-template">
+    <li class="member-row">
+      <div class="member-head">
+        <span class="member-no"></span>
+        <button type="button" class="btn-remove" data-action="remove">삭제</button>
+      </div>
+      <div class="member-fields">
+        <div class="field"><label data-for="name">성명</label><input type="text" data-field="name" data-limit="name"><p class="field-error" data-error="name" hidden></p></div>
+        <div class="field"><label data-for="org">소속</label><input type="text" data-field="org" data-limit="org"><p class="field-error" data-error="org" hidden></p></div>
+        <div class="field"><label data-for="rank">직급</label><input type="text" data-field="rank" data-limit="rank"><p class="field-error" data-error="rank" hidden></p></div>
+        <div class="field field--wide"><label data-for="role">사례에서 맡은 역할</label><input type="text" data-field="role" data-limit="role" placeholder="예) FAQ 초안 작성, 부서 간 회의 진행"><p class="field-error" data-error="role" hidden></p></div>
+      </div>
+    </li>
+  </template>
+
+  <!-- 순서 중요: 설정 → 검증 → 데이터 정리 → 화면 동작 -->
+  <script src="./config.js"></script>
+  <script src="./validation.js"></script>
+  <script src="./nomination.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
